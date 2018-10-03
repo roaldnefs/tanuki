@@ -10,7 +10,7 @@ RUN set -x \
        && apk add --no-cache --virtual .build-deps \
                git \
        && cd /go/src/github.com/roaldnefs/tanuki \
-       && go get -u github.com/spf13/cobra/cobra \
+       && go get -t -v ./... \
        && go build \
        && mv tanuki /usr/bin/tanuki \
        && rm -rf /go \
@@ -21,4 +21,4 @@ FROM alpine:latest
 COPY --from=builder /usr/bin/tanuki /usr/bin/tanuki
 
 ENTRYPOINT [ "tanuki" ]
-CMD []
+CMD [ "--help" ]
