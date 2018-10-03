@@ -1,6 +1,7 @@
 # tanuki
 
 [![Travis CI](https://img.shields.io/travis/roaldnefs/tanuki.svg?style=for-the-badge)](https://travis-ci.org/roaldnefs/tanuki)
+[![GoDoc](https://img.shields.io/badge/godoc-reference-5272B4.svg?style=for-the-badge)](https://godoc.org/github.com/roaldnefs/tanuki)
 [![Github All Releases](https://img.shields.io/github/downloads/roaldnefs/tanuki/total.svg?style=for-the-badge)](https://github.com/roaldnefs/tanuki/releases)
 
 Named after the raccoon dog logo of GitLab. A tool for performing actions on GitLab repos or a single repo.
@@ -25,5 +26,6 @@ $ go get github.com/roaldnefs/tanuki
 ## Usage
 
 ```bash
-...
+$ tanuki
+A tool for performing actions on GitLab repos or a single repo.
 ```
