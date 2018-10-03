@@ -19,13 +19,27 @@ For installation instructions from binaries please visit the [Releases Page](htt
 
 ### Via Go
 
-```bash
+```console
 $ go get github.com/roaldnefs/tanuki
 ```
 
 ## Usage
 
-```bash
-$ tanuki
+```console
+$ tanuki -h
 A tool for performing actions on GitLab repos or a single repo.
+
+Usage:
+  tanuki [command]
+
+Available Commands:
+  help        Help about any command
+  version     Print the version number of Tanuki
+
+Flags:
+      --config string   config file (default is $HOME/.tanuki.yaml)
+  -h, --help            help for tanuki
+  -t, --toggle          Help message for toggle
+
+Use "tanuki [command] --help" for more information about a command.
 ```
