@@ -13,7 +13,7 @@ import (
 var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Print the version number of Tanuki",
-	Long: `All software has versions. This is Tanuki's`,
+	Long:  `All software has versions. This is Tanuki's`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Printf("Tanuki %s %s/%s\n", "unknown", runtime.GOOS, runtime.GOARCH)
 	},
