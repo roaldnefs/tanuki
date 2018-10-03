@@ -1,5 +1,5 @@
 # tanuki
-
+<p align="left"><img src="logo/tanuki.png" alt="tanuki" height="160px"></p>
 [![Travis CI](https://img.shields.io/travis/roaldnefs/tanuki.svg?style=for-the-badge)](https://travis-ci.org/roaldnefs/tanuki)
 [![GoDoc](https://img.shields.io/badge/godoc-reference-5272B4.svg?style=for-the-badge)](https://godoc.org/github.com/roaldnefs/tanuki)
 [![Github All Releases](https://img.shields.io/github/downloads/roaldnefs/tanuki/total.svg?style=for-the-badge)](https://github.com/roaldnefs/tanuki/releases)
