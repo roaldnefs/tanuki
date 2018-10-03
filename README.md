@@ -38,8 +38,11 @@ Available Commands:
 
 Flags:
       --config string   config file (default is $HOME/.tanuki.yaml)
+  -d, --debug           enable debug logging (default false)
+      --dry-run         do not change settings just print the changes that would occur (default false)
   -h, --help            help for tanuki
-  -t, --toggle          Help message for toggle
+  -t, --token string    GitLab API token
+  -u, --url string      GitLab URL (default "https://gitlab.com/")
 
 Use "tanuki [command] --help" for more information about a command.
 ```

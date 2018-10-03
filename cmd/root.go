@@ -9,19 +9,28 @@ import (
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/xanzy/go-gitlab"
 )
 
-var cfgFile string
+const (
+	defaultBaseURL = "https://gitlab.com/"
+)
 
-// rootCmd represents the base command when called without any subcommands
-var rootCmd = &cobra.Command{
-	Use:   "tanuki",
-	Short: "A tool for performing actions on GitLab repos or a single repo.",
-	Long:  `A tool for performing actions on GitLab repos or a single repo.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	//	Run: func(cmd *cobra.Command, args []string) { },
-}
+var (
+	// Used for flags.
+	cfgFile, token, baseURL   string
+	enableDryRun, enableDebug bool
+
+	// git represent the GitLab API client.
+	git *gitlab.Client
+
+	// rootCmd represents the base command when called without any subcommands
+	rootCmd = &cobra.Command{
+		Use:   "tanuki",
+		Short: "A tool for performing actions on GitLab repos or a single repo.",
+		Long:  `A tool for performing actions on GitLab repos or a single repo.`,
+	}
+)
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
@@ -38,11 +47,19 @@ func init() {
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
+	rootCmd.PersistentFlags().BoolVarP(&enableDebug, "debug", "d", false, "enable debug logging (default false)")
+	rootCmd.PersistentFlags().BoolVarP(&enableDryRun, "dry-run", "", false, "do not change settings just print the changes that would occur (default false)")
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.tanuki.yaml)")
 
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.PersistentFlags().StringVarP(&token, "token", "t", "", "GitLab API token")
+	rootCmd.MarkFlagRequired("token")
+	viper.BindPFlag("token", rootCmd.PersistentFlags().Lookup("token"))
+
+	rootCmd.PersistentFlags().StringVarP(&baseURL, "url", "u", defaultBaseURL, "GitLab URL")
+	rootCmd.MarkFlagRequired("url")
+	viper.BindPFlag("url", rootCmd.PersistentFlags().Lookup("url"))
+
+	git = gitlab.NewClient(nil, token)
 }
 
 // initConfig reads in config file and ENV variables if set.
