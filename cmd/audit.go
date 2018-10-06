@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"errors"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/xanzy/go-gitlab"
@@ -48,7 +49,21 @@ func handleAudit(client *gitlab.Client, repository string) error {
 		log.Fatal(err)
 	}
 
+	members, err := getAllProjectMembers(client, project.ID)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	output := fmt.Sprintf("%s -> \n", project.NameWithNamespace)
+
+	if len(members) >= 1 {
+		projectMembers := []string{}
+		for _, m := range members {
+			projectMembers = append(projectMembers, fmt.Sprintf("\t\t\t%s", m.Username))
+		}
+		output += fmt.Sprintf("\tMembers (%d):\n", len(members))
+		output += fmt.Sprintf("\t\tRole (%d):\n%s\n", len(projectMembers), strings.Join(projectMembers, "\n"))
+	}
 
 	visibility := fmt.Sprintf("\tVisibility: %s", project.Visibility)
 	output += visibility + "\n"
@@ -59,6 +74,38 @@ func handleAudit(client *gitlab.Client, repository string) error {
 	fmt.Printf("%s--\n\n", output)
 
 	return nil
+}
+
+func getAllProjectMembers(client *gitlab.Client, pid interface{}) ([]*gitlab.ProjectMember, error) {
+	opt := &gitlab.ListProjectMembersOptions{
+		ListOptions: gitlab.ListOptions{
+			PerPage: 10,
+			Page:    1,
+		},
+	}
+
+	var members []*gitlab.ProjectMember
+
+	for {
+		// Get the current page with members.
+		m, resp, err := client.ProjectMembers.ListAllProjectMembers(pid, opt)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// Add newly found members to the list.
+		members = append(members, m...)
+
+		// Exit loop when we've seen all the pages.
+		if opt.Page >= resp.TotalPages {
+			break
+		}
+
+		// Update the page number to get the next page.
+		opt.Page = resp.NextPage
+	}
+
+	return members, nil
 }
 
 // getProject returns the GitLab project based on the repository name by looping
