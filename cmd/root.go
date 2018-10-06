@@ -55,11 +55,15 @@ func init() {
 	rootCmd.MarkFlagRequired("token")
 	viper.BindPFlag("token", rootCmd.PersistentFlags().Lookup("token"))
 
+	// Base URL for APU requests. Defaults to the public GitLab API, but can be
+	// set to a domain endpoint to use with a self hosted GitLab Server. baseURL
+	// should always be specified with a trailing slash.
 	rootCmd.PersistentFlags().StringVarP(&baseURL, "url", "u", defaultBaseURL, "GitLab URL")
-	rootCmd.MarkFlagRequired("url")
 	viper.BindPFlag("url", rootCmd.PersistentFlags().Lookup("url"))
 
+	// Initialize the GitLab client.
 	git = gitlab.NewClient(nil, token)
+	git.SetBaseURL(baseURL)
 }
 
 // initConfig reads in config file and ENV variables if set.
