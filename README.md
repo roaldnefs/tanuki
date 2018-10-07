@@ -10,6 +10,7 @@ Named after the raccoon dog logo of GitLab. A tool for performing actions on Git
      * [Binaries](README.md#binaries)
      * [Via Go](README.md#via-go)
 * [Usage](README.md#usage)
+     * [Audit](README.md#audit)
 
 ## Installation
 
@@ -33,6 +34,7 @@ Usage:
   tanuki [command]
 
 Available Commands:
+  audit       Audit members, branches, hooks, deploy keys etc.
   help        Help about any command
   version     Print the version number of Tanuki
 
@@ -45,4 +47,16 @@ Flags:
   -u, --url string      GitLab URL (default "https://gitlab.com/")
 
 Use "tanuki [command] --help" for more information about a command.
+```
+
+### Audit
+
+Audit members, branches, hooks, deploy keys etc.
+
+```console
+$ tanuki audit audit --token token --url https://gitlab.com/ --repository roaldnefs/tanuki
+roaldnefs / tanuki ->
+	Visibility: public
+	Merge Method: merge
+--
 ```

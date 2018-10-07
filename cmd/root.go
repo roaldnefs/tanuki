@@ -21,9 +21,6 @@ var (
 	cfgFile, token, baseURL   string
 	enableDryRun, enableDebug bool
 
-	// git represent the GitLab API client.
-	git *gitlab.Client
-
 	// rootCmd represents the base command when called without any subcommands
 	rootCmd = &cobra.Command{
 		Use:   "tanuki",
@@ -55,15 +52,11 @@ func init() {
 	rootCmd.MarkFlagRequired("token")
 	viper.BindPFlag("token", rootCmd.PersistentFlags().Lookup("token"))
 
-	// Base URL for APU requests. Defaults to the public GitLab API, but can be
+	// Base URL for API requests. Defaults to the public GitLab API, but can be
 	// set to a domain endpoint to use with a self hosted GitLab Server. baseURL
 	// should always be specified with a trailing slash.
 	rootCmd.PersistentFlags().StringVarP(&baseURL, "url", "u", defaultBaseURL, "GitLab URL")
 	viper.BindPFlag("url", rootCmd.PersistentFlags().Lookup("url"))
-
-	// Initialize the GitLab client.
-	git = gitlab.NewClient(nil, token)
-	git.SetBaseURL(baseURL)
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -90,4 +83,11 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
 	}
+}
+
+// newClient returns a GitLab client.
+func newClient() *gitlab.Client {
+	client := gitlab.NewClient(nil, token)
+	client.SetBaseURL(baseURL)
+	return client
 }
