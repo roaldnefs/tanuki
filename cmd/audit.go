@@ -173,7 +173,7 @@ func getProject(client *gitlab.Client, repository string) (*gitlab.Project, erro
 		opt.Page = resp.NextPage
 	}
 
-	return nil, errors.New(fmt.Errorf("project %s not found", repository))
+	return nil, errors.New("requested repository not found")
 }
 
 // Helper function to accept and format both the project ID or name as project
