@@ -125,8 +125,8 @@ func handleAudit(client *gitlab.Client, repository string) error {
 // getAllProjectDeployKeys returns the deploy keys of a project.
 func getAllProjectDeployKeys(client *gitlab.Client, pid interface{}) ([]*gitlab.DeployKey, error) {
 	opt := &gitlab.ListProjectDeployKeysOptions{
-			PerPage: 10,
-			Page:    1,
+		PerPage: 10,
+		Page:    1,
 	}
 
 	var deployKeys []*gitlab.DeployKey
