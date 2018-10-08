@@ -56,7 +56,25 @@ Audit members, branches, hooks, deploy keys etc.
 ```console
 $ tanuki audit audit --token token --url https://gitlab.com/ --repository roaldnefs/tanuki
 roaldnefs / tanuki ->
-	Visibility: public
+	Members (1):
+		Owner (1):
+			roaldnefs
+		Maintainer (0):
+
+		Developer (0):
+
+		Reporter (0):
+
+		Guest (0):
+
+	Deloy Keys (2):
+		Read-only (1):
+			user@server
+		Read-write (1):
+			user@server
+
+	Visibility: private
 	Merge Method: merge
+
 --
 ```

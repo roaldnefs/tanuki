@@ -6,8 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"net/url"
-	"strconv"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -59,6 +57,11 @@ func handleAudit(client *gitlab.Client, repository string) error {
 		log.Fatal(err)
 	}
 
+	keys, err := getAllProjectDeployKeys(client, project.ID)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	output := fmt.Sprintf("%s -> \n", project.NameWithNamespace)
 
 	if len(members) >= 1 {
@@ -91,6 +94,23 @@ func handleAudit(client *gitlab.Client, repository string) error {
 		output += fmt.Sprintf("\t\tGuest (%d):\n%s\n", len(guests), strings.Join(guests, "\n"))
 	}
 
+	if len(keys) >= 1 {
+		ro := []string{}
+		rw := []string{}
+
+		for _, key := range keys {
+			if *key.CanPush {
+				rw = append(ro, fmt.Sprintf("\t\t\t%s", key.Title))
+			} else {
+				ro = append(ro, fmt.Sprintf("\t\t\t%s", key.Title))
+			}
+		}
+
+		output += fmt.Sprintf("\tDeloy Keys (%d):\n", len(keys))
+		output += fmt.Sprintf("\t\tRead-only (%d):\n%s\n", len(ro), strings.Join(ro, "\n"))
+		output += fmt.Sprintf("\t\tRead-write (%d):\n%s\n", len(rw), strings.Join(rw, "\n"))
+	}
+
 	visibility := fmt.Sprintf("\tVisibility: %s", project.Visibility)
 	output += visibility + "\n"
 
@@ -102,6 +122,39 @@ func handleAudit(client *gitlab.Client, repository string) error {
 	return nil
 }
 
+// getAllProjectDeployKeys returns the deploy keys of a project.
+func getAllProjectDeployKeys(client *gitlab.Client, pid interface{}) ([]*gitlab.DeployKey, error) {
+	opt := &gitlab.ListProjectDeployKeysOptions{
+			PerPage: 10,
+			Page:    1,
+	}
+
+	var deployKeys []*gitlab.DeployKey
+
+	for {
+		// Get the current page with deploy keys.
+		keys, resp, err := client.DeployKeys.ListProjectDeployKeys(pid, opt)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// Add newly found deploy keys to the list.
+		deployKeys = append(deployKeys, keys...)
+
+		// Exit loop when we've seen all the pages.
+		if opt.Page >= resp.TotalPages {
+			break
+		}
+
+		// Update the page number to get the next page.
+		opt.Page = resp.NextPage
+	}
+
+	return deployKeys, nil
+}
+
+// getAllProjectMembers returns the project members, including inherited
+// members.
 func getAllProjectMembers(client *gitlab.Client, pid interface{}) ([]*gitlab.ProjectMember, error) {
 	opt := &gitlab.ListProjectMembersOptions{
 		ListOptions: gitlab.ListOptions{
@@ -114,11 +167,7 @@ func getAllProjectMembers(client *gitlab.Client, pid interface{}) ([]*gitlab.Pro
 
 	for {
 		// Get the current page with members.
-		//
-		// TODO Should be replaced by github.com/xanzy/go-gitlab/pull/485 the
-		// following code once merged:
-		// m, resp, err := client.ProjectMembers.ListAllProjectMembers(pid, opt)
-		m, resp, err := ListAllProjectMembers(client, pid, opt)
+		m, resp, err := client.ProjectMembers.ListAllProjectMembers(pid, opt)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -174,45 +223,4 @@ func getProject(client *gitlab.Client, repository string) (*gitlab.Project, erro
 	}
 
 	return nil, errors.New("requested repository not found")
-}
-
-// Helper function to accept and format both the project ID or name as project
-// identifier for all API calls.
-//
-// TODO Should be removed once github.com/xanzy/go-gitlab/pull/485 is merged.
-func parseID(id interface{}) (string, error) {
-	switch v := id.(type) {
-	case int:
-		return strconv.Itoa(v), nil
-	case string:
-		return v, nil
-	default:
-		return "", fmt.Errorf("invalid ID type %#v, the ID must be an int or a string", id)
-	}
-}
-
-// ListAllProjectMembers gets a list of a project's team members viewable by the
-// authenticated user. Returns a list including inherited members through
-// ancestor groups.
-//
-// TODO Should be removed once github.com/xanzy/go-gitlab/pull/485 is merged.
-func ListAllProjectMembers(client *gitlab.Client, pid interface{}, opt *gitlab.ListProjectMembersOptions, options ...gitlab.OptionFunc) ([]*gitlab.ProjectMember, *gitlab.Response, error) {
-	project, err := parseID(pid)
-	if err != nil {
-		return nil, nil, err
-	}
-	u := fmt.Sprintf("projects/%s/members/all", url.QueryEscape(project))
-
-	req, err := client.NewRequest("GET", u, opt, options)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	var pm []*gitlab.ProjectMember
-	resp, err := client.Do(req, &pm)
-	if err != nil {
-		return nil, resp, err
-	}
-
-	return pm, resp, err
 }
