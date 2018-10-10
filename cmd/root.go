@@ -18,7 +18,7 @@ const (
 
 var (
 	// Used for flags.
-	cfgFile, token, baseURL   string
+	cfgFile                   string
 	enableDryRun, enableDebug bool
 
 	// rootCmd represents the base command when called without any subcommands
@@ -48,14 +48,14 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&enableDryRun, "dry-run", "", false, "do not change settings just print the changes that would occur (default false)")
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.tanuki.yaml)")
 
-	rootCmd.PersistentFlags().StringVarP(&token, "token", "t", "", "GitLab API token")
+	rootCmd.PersistentFlags().StringP("token", "t", "", "GitLab API token")
 	rootCmd.MarkFlagRequired("token")
 	viper.BindPFlag("token", rootCmd.PersistentFlags().Lookup("token"))
 
 	// Base URL for API requests. Defaults to the public GitLab API, but can be
 	// set to a domain endpoint to use with a self hosted GitLab Server. baseURL
 	// should always be specified with a trailing slash.
-	rootCmd.PersistentFlags().StringVarP(&baseURL, "url", "u", defaultBaseURL, "GitLab URL")
+	rootCmd.PersistentFlags().StringP("url", "u", defaultBaseURL, "GitLab URL")
 	viper.BindPFlag("url", rootCmd.PersistentFlags().Lookup("url"))
 }
 
@@ -87,6 +87,8 @@ func initConfig() {
 
 // newClient returns a GitLab client.
 func newClient() *gitlab.Client {
+	token := viper.GetString("token")
+	baseURL := viper.GetString("url")
 	client := gitlab.NewClient(nil, token)
 	client.SetBaseURL(baseURL)
 	return client

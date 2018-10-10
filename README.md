@@ -11,6 +11,7 @@ Named after the raccoon dog logo of GitLab. A tool for performing actions on Git
      * [Via Go](README.md#via-go)
 * [Usage](README.md#usage)
      * [Audit](README.md#audit)
+     * [Configuration](README.md#configuration)
 
 ## Installation
 
@@ -77,4 +78,15 @@ roaldnefs / tanuki ->
 	Merge Method: merge
 
 --
+```
+
+## Configuration
+
+Tanuki will be easier to use if you provide a simple configuration file which help you eliminate providing a bunch of repeated information in flags over and over.
+
+An example `~/.tanuki.yaml` file:
+
+```yaml
+token: TOKEN
+url: https://gitlab.example.com/
 ```
