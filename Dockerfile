@@ -1,5 +1,5 @@
 FROM golang:alpine as builder
-MAINTAINER Roald Nefs <info@roaldnefs.com>
+LABEL maintainer="Roald Nefs <info@roaldnefs.com>"
 
 ENV PATH /go/bin:/usr/local/go/bin:$PATH
 ENV GOPATH /go
